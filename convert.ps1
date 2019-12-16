@@ -1,7 +1,18 @@
 #!/usr/bin/env nix-shell
 #! nix-shell -p ffmpeg -p powershell -i pwsh
 
-Get-ChildItem /media/sda1-usb-MATSHITA_HC-V380/PRIVATE/AVCHD/BDMV/STREAM/ | foreach {
+param(
+    [String] [Parameter(Mandatory=$True)] $MountPoint
+)
+
+$streamPath = "$MountPoint/PRIVATE/AVCHD/BDMV/STREAM/"
+
+if (-not (Test-Path $streamPath)) {
+    Write-Error "Cannot access $streamPath"
+    Exit 1
+}
+
+Get-ChildItem $streamPath | foreach {
     $infile = $_.FullName
     $outfile = $_.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss") + '.webm'
     $timestamp = $_.LastWriteTime.ToString("yyyyMMddTHH:mm:ssZ")
